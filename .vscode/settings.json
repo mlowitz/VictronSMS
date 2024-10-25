@@ -1,0 +1,11 @@
+{
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "black-formatter.args": [
+        "--line-length ",
+        "79"
+    ],
+    "cSpell.words": [
+        "pydantic"
+    ]
+}
