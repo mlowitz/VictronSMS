@@ -7,5 +7,13 @@
     ],
     "cSpell.words": [
         "pydantic"
-    ]
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.completionOverrideExperiment": true,
+    "python.languageServer": "Pylance",
+    "editor.defaultFormatter": "ms-python.vscode-pylance",
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.pytestParameters": true,
+    "python.analysis.inlayHints.variableTypes": true
 }

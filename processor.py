@@ -6,16 +6,17 @@ import os
 from twilio.rest import Client
 
 class Item(BaseModel):
-    phoneNumber: str
-    boatName: str   
-    installationName: str
-    freshWater1: str
-    freshWater2: str
-    lpg1: str
-    lpg2: str
-    batterySOC: str
-    poop: str
-    diesel: str
+    phoneNumber: str = None
+    boatName: str = None   
+    installationName: str = None
+    freshWater1: str = None
+    freshWater2: str = None
+    lpg1: str = None
+    lpg2: str = None
+    batterySOC: str = None
+    poop: str = None
+    diesel: str = None,
+    tanks: [] = None
     
    #Tank Type is going to be this going forward with programmable warning levels  
 low_alarm_list = ["hello world", "python programming", "data science", "machine learning"]
@@ -32,22 +33,17 @@ def processDynamic(json_data):
             warnings.append(f"{key.replace('_', ' ')} = {value}%")
     return sentences
 
+def processTanks(tank_data):
+    sentences = []
+    for tank in tank_data:
+        sentences.append(f"{tank['customName']} = {tank['value']}%\n")
+    return sentences
 
 # Next Version will create the paragraph from a key value pair 
-def process(thing=Item):
-    # This line of code is creating a formatted string `x` that represents a status report for a boat.
-    # It includes various parameters such as the boat's name, battery state of charge, fresh water
-    # levels, LPG levels, poop levels (assuming this is related to waste management), and diesel
-    # levels. The values for these parameters are taken from the `thing` object, which is an instance
-    # of the `Item` class. The `f` before the string indicates an f-string in Python, allowing for
-    # variable interpolation within the string.
+def process(thing: Item):
     paragraph = (
-    f"Status Report for , {thing.boatName}\n\n"
-    f"Battery = {thing.batterySOC}%\n"
-    f"FreshWater 1 = {thing.freshWater1}%\n"
-    f"FreshWater2 = {thing.freshWater2}%\n"
-    f"LPG 1 = {thing.lpg1}%\n"
-    f"Poop = {thing.poop}%\n"
-    f"Diesel = {thing.diesel}%\n"
+        f"Status Report for {thing.boatName}\n\n"
+        f"Battery = {thing.batterySOC}%\n"
     )
+    paragraph += ''.join(processTanks(thing.tanks))
     return paragraph
