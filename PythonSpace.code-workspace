@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"black-formatter.args": [
+			"--line-length",
+			"79"
+		],
+		"cSpell.words": [
+			"fastapi",
+			"victron"
+		]
+	}
+}

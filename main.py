@@ -11,7 +11,7 @@ from fastapi import Request, FastAPI
 
 
 app = FastAPI()
-
+userToken = ""
     
 @app.get("/")
 async def read_root():
@@ -19,8 +19,14 @@ async def read_root():
 
 @app.post("/vrm/")
 async def get_victron(request: Request):
-    t = victronHelper.getToken(await request.body())
-    return t
+    userinfo = victronHelper.getToken(await request.body())
+    return  userinfo
+
+@app.get("/vrm/getValues")
+async def getValues(info : victronHelper.installationInfo):
+    stuff = victronHelper.getValues(info)
+    return info
+
 #post 
 @app.post("/status/")
 async def status_Message(item : processor.Item):
