@@ -15,6 +15,7 @@ class TankValue(BaseModel):
     """
     customName: str| None = None
     value: str | None = None
+    type : str | None = None
 
 class Item(BaseModel):
     phoneNumber: str = None
@@ -29,17 +30,17 @@ class Item(BaseModel):
     diesel: str = None
     tanks: List[TankValue] = []
 
-low_alarm_list = ["hello world", "python programming", "data science", "machine learning"]
-high_alarm_list = ["hello world", "python programming", "data science", "machine learning"]
+low_alarm_list = ["Diesel", "LPG", "Fresh water", "Fuel", "Gasoline", "LNG"]
+high_alarm_list = ["Black water (sewage)", "python programming", "data science", "machine learning"]
 
-def processDynamic(json_data):
-    sentences = []
+def addWarnings(tank_data):
     warnings = []
-    for key, value in json_data.items():
-        sentences.append(f"{key.replace('_', ' ')} = {value}%")
-        if any(substring in s for s in low_alarm_list) and (float(value) < 25):
-            warnings.append(f"{key.replace('_', ' ')} = {value}%")
-    return sentences
+    for tank in tank_data:
+        if any(substring in tank.type for substring in low_alarm_list) and (float(tank.value.replace('%', '')) < 30):
+            warnings.append(f"Warning  {tank.customName} Low Level")
+        if any(substring in tank.type for substring in high_alarm_list) and (float(tank.value.replace('%', '')) > 75):
+            warnings.append(f"Warning  {tank.customName} High Level")
+    return warnings
 
 def processTanks(tank_data):
     sentences = []
@@ -50,7 +51,11 @@ def processTanks(tank_data):
 def process(thing: Item):
     paragraph = (
         f"Status Report for {thing.boatName}\n\n"
-        f"Battery = {thing.batterySOC}\n"
+    
     )
+    warnings = addWarnings(thing.tanks)
+    if warnings:
+        paragraph += '\n'.join(warnings) + '\n'
+    paragraph += f"\nBattery = {thing.batterySOC}"
     paragraph += '\n'.join(processTanks(thing.tanks))
     return paragraph

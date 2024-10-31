@@ -12,6 +12,14 @@
 		"cSpell.words": [
 			"fastapi",
 			"victron"
+		],
+		"extensions.closeExtensionDetailsOnViewChange": true,
+		"python.createEnvironment.contentButton": "show"
+	},
+	"extensions": {
+		"recommendations": [
+			"visualstudioexptteam.vscodeintellicode",
+			"ms-python.vscode-pylance"
 		]
 	}
 }
