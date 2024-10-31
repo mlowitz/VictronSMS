@@ -1,93 +1,84 @@
 import requests
 import json
 from typing import Union
-import json
-from fastapi import FastAPI
+from fastapi import Request
 from pydantic import BaseModel
-import os
-from twilio.rest import Client
-from fastapi import Request, FastAPI
 import processor
+from processor import TankValue
 
 class installationInfo(BaseModel):
-    token : str = None
-    user_ID : int = None
-    installationID : int = None
+    token: str = None
+    user_ID: int = None
+    installationID: int = None
 
-    
-
-#VictonURLs 
 login_url = 'https://vrmapi.victronenergy.com/v2/auth/login'
 
-
-
-def getToken(request: Request):
-    
-    response = requests.post(login_url ,request)
-    raw = json.loads(response.text)
+def getToken(request: dict):
+    response = requests.post(login_url, json=request)
+    raw = response.json()
     token = raw["token"]
     info = installationInfo()
     info.token = token
     idUser = raw["idUser"]
     info.user_ID = idUser
-    #get installation id 
-    url =f"https://vrmapi.victronenergy.com/v2/users/{idUser}/installations"
+
+    url = f"https://vrmapi.victronenergy.com/v2/users/{idUser}/installations"
     headers = {
-    "Content-Type": "application/json",
-    "x-authorization": "Bearer " + token
+        "Content-Type": "application/json",
+        "x-authorization": "Bearer " + token
     }
-    response = requests.request("GET", url, headers=headers)
-    
-    raw = json.loads(response.text)
+    response = requests.get(url, headers=headers)
+    raw = response.json()
     installationID = raw["records"][2]["idSite"]
     info.installationID = installationID
-    
-    return info   
+
+    return info
 
 def requestHelper(headers, url):
-    response = requests.request("GET", url, headers=headers)
-    data = json.loads(response.text)
-    return data
+    response = requests.get(url, headers=headers)
+    return response.json()
 
 def get_tank_device_info(json_data):
     devices = json_data.get("records", {}).get("devices", [])
-    # Filter and extract 'customName' and 'instance' for devices with 'name' as "Tank"
     tank_info = [{"customName": device.get("customName"), "instance": device.get("instance")}
                  for device in devices if device.get("name") == "Tank"]
     return tank_info
 
-def get_tank_values(tankInfo):
+def get_tank_values(tankInfo, headers, installationID):
     tanks = []
-    
     for tank in tankInfo:
-        tank_url = f"https://vrmapi.victronenergy.com/v2/installations/(info.installationID)/widgets/TankSummary?instance={tank.instance}"
+        tank_url = f"https://vrmapi.victronenergy.com/v2/installations/{installationID}/widgets/TankSummary?instance={tank['instance']}"
         data = requestHelper(headers, tank_url)
-        tankDetails = data.get("records", {}).get("data", {})
-        for attribute in tankDetails:
-            if attribute.get("code") == "tl":
-                tanks.append({tank.customName: attribute.get("formattedValue")})
-            
+        tankDetails = data.get("records", {}).get("data", [])
+        
+        for key, item in tankDetails.items():
+    # Ensure we're dealing with a dictionary containing the "code" field
+         if isinstance(item, dict) and item.get("code") == "tl":
+            tankLevel = item
+            tanks.append(TankValue(customName=tank.get("customName"), value=tankLevel.get("formattedValue")))
+            break  # Stop once the section is found
+        
+    
     return tanks
 
 def getValues(info: installationInfo):
-    values =processor.Item()
+    values = processor.Item()
     headers = {
-    "Content-Type": "application/json",
-    "x-authorization": "Bearer " + info.token
+        "Content-Type": "application/json",
+        "x-authorization": "Bearer " + info.token
     }
-     #Get SOC
-    batterysummary = f"https://vrmapi.victronenergy.com/v2/installations/{info.installationID}/widgets/BatterySummary"
-    response = requests.request("GET", batterysummary, headers=headers)
-    data = json.loads(response.text)
+
+    battery_summary = f"https://vrmapi.victronenergy.com/v2/installations/{info.installationID}/widgets/BatterySummary"
+    response = requests.get(battery_summary, headers=headers)
+    data = response.json()
     socInfo = data.get("records", {}).get("data", {}).get("51")
-    values.batterySOC= socInfo.get("formattedValue")
-    
+    values.batterySOC = socInfo.get("formattedValue")
+
     system = f"https://vrmapi.victronenergy.com/v2/installations/{info.installationID}/system-overview"
     data = requestHelper(headers, system)
-    
+
     tanks = get_tank_device_info(data)
-    tankValues = get_tank_values(tanks)
-    info.tanks = tankValues
+    tankValues = get_tank_values(tanks, headers, info.installationID)
+    values.tanks = tankValues
 
-    return info
-
+    return values

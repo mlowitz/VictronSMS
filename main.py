@@ -12,20 +12,23 @@ from fastapi import Request, FastAPI
 app = FastAPI()
 userToken = ""
 
+
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
 
 @app.post("/vrm/")
 async def get_victron(request: Request):
-    userinfo = victronHelper.getToken(await request.json())
-    return userinfo
+    user_info = victronHelper.getToken(await request.json())
+    return user_info
 
 @app.get("/vrm/getValues")
-async def getValues(info: victronHelper.installationInfo):
-    stuff = victronHelper.getValues(info)
+async def getValues(request: Request):
+    user_info = victronHelper.getToken(await request.json())
+    stuff = victronHelper.getValues(user_info)
     message = processor.process(stuff)
-    return stuff
+    result = sender.sendMessage(message)
+    return result
 
 @app.post("/status/")
 async def status_Message(item: processor.Item):
