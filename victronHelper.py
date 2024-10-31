@@ -14,6 +14,7 @@ class installationInfo(BaseModel):
     installation_Name: str = None
     supplied_name: str = None
     phone_number: str = None
+    message_time: str = None
 
 
 login_url = "https://vrmapi.victronenergy.com/v2/auth/login"
