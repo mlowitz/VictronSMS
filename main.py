@@ -9,7 +9,7 @@ import os
 import victronHelper
 from fastapi import Request, FastAPI
 
-app = FastAPI()
+app = FastAPI(openapi_url="/api/v1/openapi.json")
 userToken = ""
 
 
