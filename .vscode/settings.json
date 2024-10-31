@@ -1,10 +1,6 @@
 {
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "black-formatter.args": [
-        "--line-length ",
-        "79"
-    ],
     "cSpell.words": [
         "phonenumber",
         "pydantic"
@@ -13,7 +9,8 @@
     "python.analysis.completeFunctionParens": true,
     "python.analysis.completionOverrideExperiment": true,
     "python.languageServer": "Pylance",
-    "editor.defaultFormatter": "ms-python.vscode-pylance",
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "python.formatting.provider": "black",
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.inlayHints.pytestParameters": true,
     "python.analysis.inlayHints.variableTypes": true
