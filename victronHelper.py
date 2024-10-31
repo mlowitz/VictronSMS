@@ -10,9 +10,10 @@ class installationInfo(BaseModel):
     token: str = None
     user_ID: int = None
     installationID: int = None
+    installationName: str = None
 
 login_url = 'https://vrmapi.victronenergy.com/v2/auth/login'
-
+name =""
 def getToken(request: dict):
     response = requests.post(login_url, json=request)
     raw = response.json()
@@ -31,6 +32,7 @@ def getToken(request: dict):
     raw = response.json()
     installationID = raw["records"][2]["idSite"]
     info.installationID = installationID
+    info.installationName = raw["records"][2]["name"]
 
     return info
 
@@ -63,6 +65,7 @@ def get_tank_values(tankInfo, headers, installationID):
 
 def getValues(info: installationInfo):
     values = processor.Item()
+    values.name = info.installationName
     headers = {
         "Content-Type": "application/json",
         "x-authorization": "Bearer " + info.token
