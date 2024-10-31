@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 import configparser
 import requests
-
+import victronHelper
 
 # Read configuration from a file
 config = configparser.ConfigParser()
@@ -16,14 +16,14 @@ auth_token = config['twilio']['auth_token']
 sender_phone_number = config['twilio']['sender_phone_number']
 client = Client(account_sid, auth_token)
 
-def sendMessage(content): 
+def sendMessage(content, user_info): 
     
     client = Client(account_sid, auth_token)
 
     message = client.messages.create(
         body=content,
         from_= sender_phone_number,
-        to="+16109967105",
+        to=user_info.phone_number,
     )
     
     url = "https://hooks.zapier.com/hooks/catch/16093259/290qnju/"

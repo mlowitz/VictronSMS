@@ -27,8 +27,8 @@ async def getValues(request: Request):
     user_info = victronHelper.getToken(await request.json())
     stuff = victronHelper.getValues(user_info)
     message = processor.process(stuff)
-    result = sender.sendMessage(message)
-    return result.status
+    result = sender.sendMessage(message, user_info)
+    return result.stat
 
 @app.post("/status/")
 async def status_Message(item: processor.Item):

@@ -12,6 +12,7 @@ class installationInfo(BaseModel):
     installationID: int = None
     installation_Name: str = None
     supplied_name: str = None
+    phone_number: str = None
 
 login_url = 'https://vrmapi.victronenergy.com/v2/auth/login'
 name =""
@@ -23,7 +24,8 @@ def getToken(request: dict):
     info.token = token
     idUser = raw["idUser"]
     info.user_ID = idUser
-    info.supplied_name = request.get("supplied_name")
+    info.supplied_name = request.get("supplied_name", None)
+    info.phone_number = request.get("phone_number", None)
 
     url = f"https://vrmapi.victronenergy.com/v2/users/{idUser}/installations"
     headers = {

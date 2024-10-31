@@ -6,6 +6,7 @@
         "79"
     ],
     "cSpell.words": [
+        "phonenumber",
         "pydantic"
     ],
     "python.analysis.autoImportCompletions": true,
