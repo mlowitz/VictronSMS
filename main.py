@@ -8,6 +8,7 @@ from twilio.rest import Client
 import os
 import victronHelper
 from fastapi import Request, FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
 userToken = ""
