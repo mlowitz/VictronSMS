@@ -1,5 +1,8 @@
 from asyncio.windows_events import NULL
+from email import header
 from mmap import ACCESS_COPY
+import re
+from http import request
 import requests
 import json
 from typing import Literal, Union
@@ -29,6 +32,10 @@ access_token_url = (
 )
 all_access_tokens_url = (
     "https://vrmapi.victronenergy.com/v2/users/{}/accesstokens/list"
+)
+
+access_token_expected_error = (
+    "The given name for the accesstoken is not unique"
 )
 
 
@@ -87,11 +94,35 @@ def getAccessToken(onboardingInfo: onboardingRequest):
     if raw["success"] == True:
         # return access token
         onboardingInfo.access_token = raw["token"]
+    else:
+        if raw["errors"] and raw["errors"][0].get("name"):
+            revokeAccessToken(onboardingInfo)
+            getAccessToken(onboardingInfo)
+            # delte and remake access token
     # todo get access token if it exists
 
 
 # else:
 # TODO get token info delete it and then recreate it
+def revokeAccessToken(onboardingInfo: onboardingRequest):
+    # delete access token with name SMS Notifier
+    headers = {
+        "Content-Type": "application/json",
+        "x-authorization": "Token " + onboardingInfo.access_token,
+    }
+    tokens_for_use = requestHelper(
+        headers,
+        f"https://vrmapi.victronenergy.com/v2/users/{onboardingInfo.user_ID}/accesstokens/list",
+    )
+    tokens = tokens_for_use.get("tokens", [])
+    for token in tokens:
+        if token.get("name") == access_token_name:
+            idAccessToken = token.get("idAccessToken")
+            victronHelper.requestHelper(
+                headers,
+                f"https://vrmapi.victronenergy.com/v2/users/{onboardingInfo.user_ID}/accesstokens/{idAccessToken}/revoke",
+            )
+    pass
 
 
 def getInstallationInfo(onboardingInfo: onboardingRequest):
@@ -129,4 +160,9 @@ def getInstallationInfo(onboardingInfo: onboardingRequest):
 
 def requestHelper(headers, url):
     response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Failed to get access token",
+        )
     return response.json()
