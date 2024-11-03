@@ -1,17 +1,18 @@
+import json
+import re
 from asyncio.windows_events import NULL
 from email import header
-from mmap import ACCESS_COPY
-import re
 from http import request
-import requests
-import json
+from mmap import ACCESS_COPY
 from typing import Literal, Union
-from fastapi import Request
+
+import requests
+from fastapi import HTTPException, Request
 from pydantic import BaseModel
-import processor
-from processor import TankValue
-from fastapi import HTTPException
-import victronHelper
+
+import VictronProcessors.processor as processor
+import VictronProcessors.victronHelper as victronHelper
+from VictronProcessors.processor import TankValue
 
 
 class onboardingRequest(BaseModel):
@@ -90,15 +91,16 @@ def getAccessToken(onboardingInfo: onboardingRequest):
             detail="Failed to get access token",
         )
     request_json = json.dumps(request_data)
+
     raw = response.json()
     if raw["success"] == True:
         # return access token
         onboardingInfo.access_token = raw["token"]
-    else:
+    else:  # delete token and recreate it
         if raw["errors"] and raw["errors"][0].get("name"):
             revokeAccessToken(onboardingInfo)
             getAccessToken(onboardingInfo)
-            # delte and remake access token
+
     # todo get access token if it exists
 
 

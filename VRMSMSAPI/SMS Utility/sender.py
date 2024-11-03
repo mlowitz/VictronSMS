@@ -1,10 +1,11 @@
-from twilio.rest import Client
-import os
-from fastapi import FastAPI
 import configparser
-import requests
-import victronHelper
+import os
 
+import requests
+from fastapi import FastAPI
+from twilio.rest import Client
+
+import VictronProcessors.victronHelper as victronHelper
 
 # Read configuration from a file
 config = configparser.ConfigParser()
