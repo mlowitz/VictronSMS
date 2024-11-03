@@ -15,5 +15,22 @@
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.inlayHints.pytestParameters": true,
     "python.analysis.inlayHints.variableTypes": true,
-    "isort.args":["--profile", "black"]
+    "isort.args": [
+        "--profile",
+        "black"
+    ],
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./VRMSMSAPI",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "pythonTestExplorer.testFramework": "unittest",
+    "pythonTestExplorer.testplanEnabled": true,
+    "testExplorer.addToEditorContextMenu": true,
+    "testExplorer.mergeSuites": true,
+    "debugpy.showPythonInlineValues": true
 }
