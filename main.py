@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from twilio.rest import Client
 
 import VictronProcessors.processor as processor
-from . import sender
+from .VRMSMSAPI import sender
 import VictronProcessors.victronHelper as victronHelper
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
