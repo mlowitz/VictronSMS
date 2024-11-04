@@ -1,66 +1,22 @@
-import requests
 import json
+from mmap import ACCESS_COPY
 from typing import Literal, Union
-from fastapi import Request
+
+import requests
+from fastapi import HTTPException, Request
 from pydantic import BaseModel
-import processor
-from processor import TankValue
+
+import app.VictronProcessors.processor as processor
+from app.VictronProcessors.processor import TankValue
 
 
 class installationInfo(BaseModel):
-    token: str = None
+    access_token: str = None
     user_ID: int = None
     installationID: int = None
     installation_Name: str = None
-    supplied_name: str = None
     phone_number: str = None
-
-
-login_url = "https://vrmapi.victronenergy.com/v2/auth/login"
-name = ""
-
-
-def getToken(request: dict):
-    response = requests.post(login_url, json=request)
-    raw = response.json()
-    token = raw["token"]
-    info = installationInfo()
-    info.token = token
-    idUser = raw["idUser"]
-    info.user_ID = idUser
-    info.supplied_name = request.get("supplied_name", None)
-    info.phone_number = request.get("phone_number", None)
-
-    url = f"https://vrmapi.victronenergy.com/v2/users/{idUser}/installations"
-    headers = {
-        "Content-Type": "application/json",
-        "x-authorization": "Bearer " + token,
-    }
-    response = requests.get(url, headers=headers)
-    raw = response.json()
-    # if user does not supply installation name
-    if info.supplied_name == None:
-        info.installationID = raw["records"][0]["idSite"]
-        info.installation_Name = raw["records"][0]["name"]
-        return info
-
-    records = raw.get("records", [])
-    for item in records:
-        # Ensure we're dealing with a dictionary containing the "code" field
-        if (
-            isinstance(item, dict)
-            and info.supplied_name.lower() in item.get("name", "").lower()
-        ):
-            info.installation_Name = item.get("name")
-            info.installationID = item.get("idSite")
-            break
-
-    return info
-
-
-def requestHelper(headers, url):
-    response = requests.get(url, headers=headers)
-    return response.json()
+    message_time: str = None
 
 
 def get_tank_device_info(json_data):
@@ -106,7 +62,7 @@ def get_tank_values(tank_info, headers, installationID):
                 if any(x.customName == customName for x in tanks):
                     for tank_entry in tanks:
                         if tank_entry.customName == customName:
-                            tank_entry.value = tank_info.get("formattedValue")
+                            tank_entry.type = tank_info.get("formattedValue")
 
                 else:
                     tanks.append(
@@ -120,12 +76,17 @@ def get_tank_values(tank_info, headers, installationID):
     return tanks
 
 
+def requestHelper(headers, url):
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
 def getValues(info: installationInfo):
     values = processor.Item()
     values.boatName = info.installation_Name
     headers = {
         "Content-Type": "application/json",
-        "x-authorization": "Bearer " + info.token,
+        "x-authorization": "Token " + info.access_token,
     }
 
     battery_summary = f"https://vrmapi.victronenergy.com/v2/installations/{info.installationID}/widgets/BatterySummary"

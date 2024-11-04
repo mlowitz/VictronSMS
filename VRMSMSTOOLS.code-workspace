@@ -14,7 +14,9 @@
 			"victron"
 		],
 		"extensions.closeExtensionDetailsOnViewChange": true,
-		"python.createEnvironment.contentButton": "show"
+		"python.createEnvironment.contentButton": "show",
+		"pythonTestExplorer.testFramework": "pytest",
+		"python.testing.unittestEnabled": false
 	},
 	"extensions": {
 		"recommendations": [
