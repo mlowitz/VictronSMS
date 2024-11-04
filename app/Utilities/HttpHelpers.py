@@ -1,5 +1,5 @@
 from enum import Enum
-from http import HTTPStatus, request
+from http import HTTPStatus
 
 import requests
 from fastapi import HTTPException
