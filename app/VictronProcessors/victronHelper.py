@@ -1,5 +1,4 @@
 import json
-from asyncio.windows_events import NULL
 from mmap import ACCESS_COPY
 from typing import Literal, Union
 
@@ -7,8 +6,8 @@ import requests
 from fastapi import HTTPException, Request
 from pydantic import BaseModel
 
-import VictronProcessors.processor as processor
-from VictronProcessors.processor import TankValue
+import app.VictronProcessors.processor as processor
+from app.VictronProcessors.processor import TankValue
 
 
 class installationInfo(BaseModel):

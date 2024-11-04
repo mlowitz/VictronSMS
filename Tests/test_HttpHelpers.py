@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi import HTTPException
 
-from Utilities.HttpHelpers import AuthType, GetHelper, PostHelper
+from app.Utilities.HttpHelpers import AuthType, GetHelper, PostHelper
 
 
 @pytest.fixture

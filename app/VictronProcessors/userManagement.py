@@ -1,6 +1,5 @@
 import json
 import re
-from asyncio.windows_events import NULL
 from email import header
 from http import request
 from mmap import ACCESS_COPY
@@ -10,9 +9,9 @@ import requests
 from fastapi import HTTPException, Request
 from pydantic import BaseModel
 
-import VictronProcessors.processor as processor
-import VictronProcessors.victronHelper as victronHelper
-from VictronProcessors.processor import TankValue
+import app.VictronProcessors.processor as processor
+import app.VictronProcessors.victronHelper as victronHelper
+from app.VictronProcessors.processor import TankValue
 
 
 class onboardingRequest(BaseModel):

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from VictronProcessors.processor import TankValue
-from VictronProcessors.victronHelper import (
+from app.VictronProcessors.processor import TankValue
+from app.VictronProcessors.victronHelper import (
     Í,
     get_tank_device_info,
     get_tank_values,
