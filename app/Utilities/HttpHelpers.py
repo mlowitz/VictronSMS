@@ -24,7 +24,7 @@ def GetHelper(authType, token, url, data=None):
                 detail="Bad Token Type",
             )
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, json=data)
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
@@ -47,7 +47,7 @@ def PostHelper(authType, token, url, data=None):
                 detail="Bad Token Type",
             )
 
-    response = requests.get(url, headers=headers)
+    response = requests.post(url, headers=headers, json=data)
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,

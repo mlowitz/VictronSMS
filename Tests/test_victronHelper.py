@@ -23,7 +23,7 @@ class TestVictronHelper(unittest.TestCase):
             {"customName": "Tank 2", "instance": 2},
         ]
 
-    @patch("victronHelper.requests.get")
+    @patch("app.VictronProcessors.victronHelper.requests.get")
     def test_requestHelper(self, mock_get):
         mock_response = MagicMock()
         mock_response.json.return_value = {"key": "value"}
@@ -54,7 +54,7 @@ class TestVictronHelper(unittest.TestCase):
         ]
         self.assertEqual(get_tank_device_info(json_data), expected_output)
 
-    @patch("victronHelper.requestHelper")
+    @patch("app.VictronProcessors.victronHelper.requestHelper")
     def test_get_tank_values(self, mock_requestHelper):
         mock_requestHelper.return_value = {
             "records": {
@@ -66,8 +66,8 @@ class TestVictronHelper(unittest.TestCase):
         }
 
         expected_output = [
-            TankValue(customName="Tank 1", value="50%"),
-            TankValue(customName="Tank 1", type="Fresh Water"),
+            TankValue(customName="Tank 1", value="50%", type="Fresh Water"),
+            TankValue(customName="Tank 2", value="50%", type="Fresh Water"),
         ]
 
         self.assertEqual(
@@ -75,9 +75,9 @@ class TestVictronHelper(unittest.TestCase):
             expected_output,
         )
 
-    @patch("victronHelper.requests.get")
-    @patch("victronHelper.get_tank_values")
-    @patch("victronHelper.get_tank_device_info")
+    @patch("app.VictronProcessors.victronHelper.requests.get")
+    @patch("app.VictronProcessors.victronHelper.get_tank_values")
+    @patch("app.VictronProcessors.victronHelper.get_tank_device_info")
     def test_getValues(
         self,
         mock_get_tank_device_info,

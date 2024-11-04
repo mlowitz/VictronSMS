@@ -62,7 +62,7 @@ def get_tank_values(tank_info, headers, installationID):
                 if any(x.customName == customName for x in tanks):
                     for tank_entry in tanks:
                         if tank_entry.customName == customName:
-                            tank_entry.value = tank_info.get("formattedValue")
+                            tank_entry.type = tank_info.get("formattedValue")
 
                 else:
                     tanks.append(
@@ -86,7 +86,7 @@ def getValues(info: installationInfo):
     values.boatName = info.installation_Name
     headers = {
         "Content-Type": "application/json",
-        "x-authorization": "Bearer " + info.token,
+        "x-authorization": "Token " + info.access_token,
     }
 
     battery_summary = f"https://vrmapi.victronenergy.com/v2/installations/{info.installationID}/widgets/BatterySummary"
