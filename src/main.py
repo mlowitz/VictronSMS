@@ -52,7 +52,7 @@ async def onBoard(request: userManagement.onboardingRequest):
     stuff = victronHelper.getValues(user_info)
     message = processor.process(stuff)
     result = sender.sendMessage(message, user_info)
-    return result.stat
+    return result
 
 
 @app.post("/status/")

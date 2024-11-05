@@ -52,7 +52,7 @@ except Exception as e:
 
 def addSubscriber(subscriber: userManagement.SubscribedUser):
     subscriber_dict = subscriber.__dict__
-    subscribers_collection.insert_one(dumps(subscriber))
+    subscribers_collection.insert_one(subscriber.__dict__)
     pass
 
 
