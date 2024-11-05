@@ -6,9 +6,10 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from twilio.rest import Client
 
-import VictronProcessors.processor as processor
-from .VRMSMSAPI import sender
-import VictronProcessors.victronHelper as victronHelper
+import app.VictronProcessors.processor as processor
+import app.SMSUtility.sender as sender
+import app.VictronProcessors.victronHelper as victronHelper
+import app.VictronProcessors.userManagement as userManagement
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
 userToken = ""
@@ -27,7 +28,17 @@ async def get_victron(request: Request):
 
 @app.get("/vrm/getValues")
 async def getValues(request: Request):
-    user_info = victronHelper.getToken(await request.json())
+    user_info = userManagement.getToken(await request.json())
+    stuff = victronHelper.getValues(user_info)
+    message = processor.process(stuff)
+    result = sender.sendMessage(message, user_info)
+    return result.stat
+
+
+@app.get("/vrm/onboard")
+async def getValues(request: userManagement.onboardingRequest):
+    user_info = userManagement.onBoarding(request)
+    # TODO - Add the user to the database
     stuff = victronHelper.getValues(user_info)
     message = processor.process(stuff)
     result = sender.sendMessage(message, user_info)

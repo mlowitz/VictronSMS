@@ -5,11 +5,13 @@ import requests
 from fastapi import FastAPI
 from twilio.rest import Client
 
-import VictronProcessors.victronHelper as victronHelper
 
 # Read configuration from a file
 config = configparser.ConfigParser()
-config.read(os.path.join(os.path.dirname(__file__), "config.ini"))
+config_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "config.ini"
+)
+config.read(config_path)
 # Ensure the config file has the necessary sections and keys
 if (
     "twilio" not in config
@@ -27,15 +29,15 @@ def sendMessage(content, user_info):
 
     client = Client(account_sid, auth_token)
 
+    url = "https://hooks.zapier.com/hooks/catch/16093259/290qnju/"
+    headers = {"Content-Type": "application/json"}
+    data = {"message": content}
+    response = requests.post(url, headers=headers, json=data)
+
     message = client.messages.create(
         body=content,
         from_=sender_phone_number,
         to=user_info.phone_number,
     )
-
-    url = "https://hooks.zapier.com/hooks/catch/16093259/290qnju/"
-    headers = {"Content-Type": "application/json"}
-    data = {"message": content}
-    response = requests.post(url, headers=headers, json=data)
 
     return message
