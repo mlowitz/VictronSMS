@@ -6,8 +6,8 @@ import requests
 from fastapi import HTTPException, Request
 from pydantic import BaseModel
 
-import app.VictronProcessors.processor as processor
-from app.VictronProcessors.processor import TankValue
+import src.VictronProcessors.processor as processor
+from src.VictronProcessors.processor import TankValue
 
 
 class installationInfo(BaseModel):

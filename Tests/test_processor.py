@@ -1,6 +1,6 @@
 import pytest
 
-from app.VictronProcessors.processor import (
+from src.VictronProcessors.processor import (
     Item,
     TankValue,
     addWarnings,
