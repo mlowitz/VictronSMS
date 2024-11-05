@@ -9,7 +9,7 @@ COPY src ./src
 COPY ./src /code/src
 
 
-CMD ["uvicorn", "src.main:app", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
 
 
 # If running behind a proxy like Nginx or Traefik add --proxy-headers
