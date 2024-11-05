@@ -49,7 +49,6 @@ async def getValues(request: Request):
 @app.post("/vrm/onboard")
 async def onBoard(request: userManagement.onboardingRequest):
     user_info = userManagement.onBoarding(request)
-    # TODO - Add the user to the database
     databaseManager.addSubscriber(user_info)
     stuff = victronHelper.getValues(user_info)
     message = processor.process(stuff)

@@ -1,12 +1,13 @@
 import configparser
+import json
 import os
 import sys
-from bson.json_util import dumps
-from bson.json_util import loads
+
 import pymongo
-import json
+from bson.json_util import dumps, loads
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+
 import app.VictronProcessors.userManagement as userManagement
 
 # Read configuration from a file
@@ -45,6 +46,8 @@ try:
         print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
+
+# TODO - check for uniquie subscriber before adding
 
 
 def addSubscriber(subscriber: userManagement.SubscribedUser):
