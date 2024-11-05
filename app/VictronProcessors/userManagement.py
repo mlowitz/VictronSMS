@@ -1,8 +1,5 @@
 import json
 import re
-from email import header
-from http import request
-from mmap import ACCESS_COPY
 from typing import Literal, Union
 
 import requests
@@ -20,10 +17,33 @@ class onboardingRequest(BaseModel):
     supplied_name: str = None
     phone_number: str = None
     time: str = None
-    supplied_name: str = None
+    installation_Name: str = None
     bearer_token: str = None
     user_ID: int = None
+    installationID: int = None
     access_token: str = None
+
+
+class SubscribedUser(BaseModel):
+    user_ID: int = None
+    phone_number: str = None
+    installationID: int = None
+    installation_Name: str = None
+    access_token: str = None
+    time: str = None
+    phone_number: str = None
+
+
+def from_json(json_str: str) -> SubscribedUser:
+    data = json.loads(json_str)
+    user = SubscribedUser()
+    user.user_ID = data.get("user_ID")
+    user.phone_number = data.get("phone_number")
+    user.installationID = data.get("installationID")
+    user.installation_Name = data.get("installation_Name")
+    user.access_token = data.get("access_token")
+    user.time = data.get("time")
+    return user
 
 
 login_url = "https://vrmapi.victronenergy.com/v2/auth/login"
@@ -43,9 +63,22 @@ name = ""
 access_token_name = "SMSNotifier"
 
 
+def map_onboarding_to_subscribed(
+    onboarding: onboardingRequest,
+) -> SubscribedUser:
+    user = SubscribedUser()
+    user.user_ID = onboarding.user_ID
+    user.phone_number = onboarding.phone_number
+    user.installationID = onboarding.installationID
+    user.installation_Name = onboarding.installation_Name
+    user.access_token = onboarding.access_token
+    user.time = onboarding.time
+    return user
+
+
 def getBearerToken(request: onboardingRequest):
     request_data = {
-        "name": request.username,
+        "username": request.username,
         "password": request.password,
     }
     headers = {
@@ -67,14 +100,12 @@ def onBoarding(request: onboardingRequest):
     getBearerToken(request)
     getAccessToken(request)
     getInstallationInfo(request)
-    return request
+    user = map_onboarding_to_subscribed(request)
+    return user
 
 
 def getAccessToken(onboardingInfo: onboardingRequest):
-    request_data = {
-        "name": access_token_name,
-        "password": onboardingInfo.password,
-    }
+    request_data = {"name": access_token_name}
     headers = {
         "Content-Type": "application/json",
         "x-authorization": "Bearer " + onboardingInfo.bearer_token,
@@ -96,7 +127,10 @@ def getAccessToken(onboardingInfo: onboardingRequest):
         # return access token
         onboardingInfo.access_token = raw["token"]
     else:  # delete token and recreate it
-        if raw["errors"] and raw["errors"][0].get("name"):
+        if (
+            raw["errors"]
+            and raw["errors"].get("name") == access_token_expected_error
+        ):
             revokeAccessToken(onboardingInfo)
             getAccessToken(onboardingInfo)
 
@@ -109,7 +143,7 @@ def revokeAccessToken(onboardingInfo: onboardingRequest):
     # delete access token with name SMS Notifier
     headers = {
         "Content-Type": "application/json",
-        "x-authorization": "Token " + onboardingInfo.access_token,
+        "x-authorization": "Bearer " + onboardingInfo.bearer_token,
     }
     tokens_for_use = requestHelper(
         headers,
