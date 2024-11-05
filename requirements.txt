@@ -1,4 +1,10 @@
 fastapi
+fastapi[standard]
 redis
 types-redis
 uvicorn
+pydantic
+requests
+twilio
+pymongo
+pytest

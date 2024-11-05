@@ -8,7 +8,7 @@ from bson.json_util import dumps, loads
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-import app.VictronProcessors.userManagement as userManagement
+import src.VictronProcessors.userManagement as userManagement
 
 # Read configuration from a file
 config = configparser.ConfigParser()
@@ -47,7 +47,7 @@ try:
 except Exception as e:
     print(e)
 
-# TODO - check for uniquie subscriber before adding
+# TODO - check for unique subscriber before adding
 
 
 def addSubscriber(subscriber: userManagement.SubscribedUser):

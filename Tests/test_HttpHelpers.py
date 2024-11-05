@@ -5,7 +5,7 @@ import pytest
 from fastapi import HTTPException
 
 
-from app.Utilities.httpHelpers import AuthType, GetHelper, PostHelper
+from src.Utilities.HttpHelpers import AuthType, GetHelper, PostHelper
 
 
 @pytest.fixture

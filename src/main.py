@@ -4,13 +4,12 @@ from typing import Union
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-from twilio.rest import Client
 
-import app.VictronProcessors.processor as processor
-import app.SMSUtility.sender as sender
-import app.VictronProcessors.victronHelper as victronHelper
-import app.VictronProcessors.userManagement as userManagement
-import app.Utilities.databaseManager as databaseManager
+import src.VictronProcessors.processor as processor
+import src.SMSUtility.sender as sender
+import src.VictronProcessors.victronHelper as victronHelper
+import src.VictronProcessors.userManagement as userManagement
+import src.Utilities.databaseManager as databaseManager
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
 userToken = ""
