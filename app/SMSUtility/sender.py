@@ -13,31 +13,25 @@ config_path = os.path.join(
 )
 config.read(config_path)
 # Ensure the config file has the necessary sections and keys
-if (
-    "twilio" not in config
-    or "account_sid" not in config["twilio"]
-    or "auth_token" not in config["twilio"]
-):
-    raise ValueError("Config file is missing required Twilio configuration")
-account_sid = config["twilio"]["account_sid"]
+if "openphone" not in config or "key" not in config["openphone"]:
+    raise ValueError("Config file is missing required openphone configuration")
+key = config["openphone"]["key"]
 auth_token = config["twilio"]["auth_token"]
-sender_phone_number = config["twilio"]["sender_phone_number"]
-client = Client(account_sid, auth_token)
+sender_phone_number = config["openphone"]["sender_phone_number"]
 
 
 def sendMessage(content, user_info):
 
-    client = Client(account_sid, auth_token)
-
-    url = "https://hooks.zapier.com/hooks/catch/16093259/290qnju/"
-    headers = {"Content-Type": "application/json"}
-    data = {"message": content}
+    url = "https://api.openphone.com/v1/messages"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": key,
+    }
+    data = {
+        "content": content,
+        "from": sender_phone_number,
+        "to": [f"{user_info.phone_number}"],
+    }
     response = requests.post(url, headers=headers, json=data)
 
-    message = client.messages.create(
-        body=content,
-        from_=sender_phone_number,
-        to=user_info.phone_number,
-    )
-
-    return message
+    return response

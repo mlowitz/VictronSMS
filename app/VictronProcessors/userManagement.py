@@ -33,17 +33,17 @@ class SubscribedUser(BaseModel):
     time: str = None
     phone_number: str = None
 
-    def map_onboarding_to_subscribed(
-        onboarding: onboardingRequest,
-    ):
-        return SubscribedUser(
-            user_ID=onboarding.user_ID,
-            phone_number=onboarding.phone_number,
-            installationID=onboarding.installationID,
-            installation_Name=onboarding.installation_Name,
-            access_token=onboarding.access_token,
-            time=onboarding.time,
-        )
+
+def from_json(json_str: str) -> SubscribedUser:
+    data = json.loads(json_str)
+    user = SubscribedUser()
+    user.user_ID = data.get("user_ID")
+    user.phone_number = data.get("phone_number")
+    user.installationID = data.get("installationID")
+    user.installation_Name = data.get("installation_Name")
+    user.access_token = data.get("access_token")
+    user.time = data.get("time")
+    return user
 
 
 login_url = "https://vrmapi.victronenergy.com/v2/auth/login"
@@ -66,14 +66,14 @@ access_token_name = "SMSNotifier"
 def map_onboarding_to_subscribed(
     onboarding: onboardingRequest,
 ) -> SubscribedUser:
-    return SubscribedUser(
-        user_ID=onboarding.user_ID,
-        phone_number=onboarding.phone_number,
-        installationID=onboarding.installationID,
-        installation_Name=onboarding.installation_Name,
-        access_token=onboarding.access_token,
-        time=onboarding.time,
-    )
+    user = SubscribedUser()
+    user.user_ID = onboarding.user_ID
+    user.phone_number = onboarding.phone_number
+    user.installationID = onboarding.installationID
+    user.installation_Name = onboarding.installation_Name
+    user.access_token = onboarding.access_token
+    user.time = onboarding.time
+    return user
 
 
 def getBearerToken(request: onboardingRequest):
@@ -100,7 +100,8 @@ def onBoarding(request: onboardingRequest):
     getBearerToken(request)
     getAccessToken(request)
     getInstallationInfo(request)
-    return map_onboarding_to_subscribed(request)
+    user = map_onboarding_to_subscribed(request)
+    return user
 
 
 def getAccessToken(onboardingInfo: onboardingRequest):
