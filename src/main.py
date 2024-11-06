@@ -36,7 +36,7 @@ async def read_root():
         os.path.join(os.path.dirname(__file__), "configs/config.json")
     ) as config_file:
         config = json.load(config_file)
-    return {"Hello": "World"}
+    return config
 
 
 @app.post("/vrm/")
