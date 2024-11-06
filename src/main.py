@@ -6,6 +6,14 @@ from typing import Union
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
+
+with open(
+    os.path.join(os.path.dirname(__file__), "configs/config.json")
+) as config_file:
+    config = json.load(config_file)
+    for key, value in config.items():
+        os.environ[key] = str(value)
+
 import src.VictronProcessors.processor as processor
 import src.SMSUtility.sender as sender
 import src.VictronProcessors.victronHelper as victronHelper
@@ -20,6 +28,13 @@ class onboardBody(BaseModel):
     phone_number: str = None
     time: str = None
 
+
+with open(
+    os.path.join(os.path.dirname(__file__), "configs/config.json")
+) as config_file:
+    config = json.load(config_file)
+    for key, value in config.items():
+        os.environ[key] = str(value)
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
 userToken = ""
@@ -48,6 +63,8 @@ async def get_victron(request: Request):
 @app.get("/vrm/run")
 async def getValues():
     user_info = databaseManager.getAllSubscriptions()
+    if not user_info:
+        return {"run": "No users to run"}
     for user in user_info:
         stuff = victronHelper.getValues(user)
         message = processor.process(stuff)
@@ -58,11 +75,13 @@ async def getValues():
 @app.get("/vrm/runTime")
 async def getValues():
     user_info = databaseManager.getAllSubscriptionsForTime()
+    if not user_info:
+        return {"run": "No users to run"}
     for user in user_info:
         stuff = victronHelper.getValues(user)
         message = processor.process(stuff)
         result = sender.sendMessage(message, user)
-    return {"run": "done"}
+    return {"run": f"Run for {user_info.count()} users"}
 
 
 @app.get("/vrm/getValues")
