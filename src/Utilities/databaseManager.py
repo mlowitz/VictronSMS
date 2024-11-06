@@ -53,11 +53,10 @@ except Exception as e:
 def addSubscriber(subscriber: userManagement.SubscribedUser):
     subscriber_dict = subscriber.__dict__
     try:
+        key = {"user_ID": subscriber.user_ID}
         subscribers_collection.update_one(
-            {team: "Hornets"},
-            {
-                "$set": subscriber_dict,
-            },
+            key,
+            {"$setOnInsert": subscriber_dict},
             upsert=True,
         )
     except Exception as e:

@@ -62,9 +62,6 @@ async def onBoard(request: userManagement.onboardingRequest):
         userManagement.onboardingDetails.from_onboarding_request(request)
     )
     databaseManager.addSubscriber(user_info)
-    stuff = victronHelper.getValues(user_info)
-    message = processor.process(stuff)
-    result = sender.sendMessage(message, user_info)
     return {"status": "done"}
 
 
