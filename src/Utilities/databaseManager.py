@@ -56,7 +56,7 @@ def addSubscriber(subscriber: userManagement.SubscribedUser):
         key = {"user_ID": subscriber.user_ID}
         subscribers_collection.update_one(
             key,
-            {"$setOnInsert": subscriber_dict},
+            {"$set": subscriber_dict},
             upsert=True,
         )
     except Exception as e:
