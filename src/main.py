@@ -30,6 +30,15 @@ async def read_root():
     return {"Hello": "World"}
 
 
+@app.get("/json")
+async def read_root():
+    with open(
+        os.path.join(os.path.dirname(__file__), "configs/config.json")
+    ) as config_file:
+        config = json.load(config_file)
+    return {"Hello": "World"}
+
+
 @app.post("/vrm/")
 async def get_victron(request: Request):
     user_info = victronHelper.getToken(await request.json())
@@ -39,6 +48,16 @@ async def get_victron(request: Request):
 @app.get("/vrm/run")
 async def getValues():
     user_info = databaseManager.getAllSubscriptions()
+    for user in user_info:
+        stuff = victronHelper.getValues(user)
+        message = processor.process(stuff)
+        result = sender.sendMessage(message, user)
+    return {"run": "done"}
+
+
+@app.get("/vrm/runTime")
+async def getValues():
+    user_info = databaseManager.getAllSubscriptionsForTime()
     for user in user_info:
         stuff = victronHelper.getValues(user)
         message = processor.process(stuff)

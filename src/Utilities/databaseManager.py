@@ -1,7 +1,9 @@
 import configparser
+import datetime
 import json
 import os
 import sys
+from datetime import datetime
 
 import pymongo
 from bson.json_util import dumps, loads
@@ -10,19 +12,15 @@ from pymongo.server_api import ServerApi
 
 import src.VictronProcessors.userManagement as userManagement
 
+# Read configuration from environment variables
+connection_string = os.getenv("MONGODB_CONNECTION_STRING")
+
+if not connection_string:
+    raise ValueError(
+        "Environment variable MONGODB_CONNECTION_STRING is missing"
+    )
+
 # Read configuration from a file
-config = configparser.ConfigParser()
-config_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "config.ini"
-)
-
-
-config.read(config_path)
-# Ensure the config file has the necessary sections and keys
-if "mongodb" not in config or "connection_string" not in config["mongodb"]:
-    raise ValueError("Config file is missing required Twilio configuration")
-connection_string = config["mongodb"]["connection_string"]
-
 
 try:
     client = MongoClient(connection_string)
@@ -66,6 +64,17 @@ def addSubscriber(subscriber: userManagement.SubscribedUser):
 
 def getAllSubscriptions() -> list[userManagement.SubscribedUser]:
     raw = list(subscribers_collection.find({}))
+    subscriptions: list[userManagement.SubscribedUser] = [
+        userManagement.from_json(dumps(doc)) for doc in raw
+    ]
+    return subscriptions
+    pass
+
+
+def getAllSubscriptionsForTime() -> list[userManagement.SubscribedUser]:
+    current_hour = str(datetime.now().hour)
+    search = {"time": current_hour}
+    raw = list(subscribers_collection.find(search))
     subscriptions: list[userManagement.SubscribedUser] = [
         userManagement.from_json(dumps(doc)) for doc in raw
     ]

@@ -3,6 +3,7 @@ fastapi[standard]
 redis
 types-redis
 uvicorn
+uvicorn[standard]
 pydantic
 requests
 twilio

@@ -6,18 +6,15 @@ from fastapi import FastAPI
 from twilio.rest import Client
 
 
-# Read configuration from a file
-config = configparser.ConfigParser()
-config_path = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "config.ini"
-)
-config.read(config_path)
-# Ensure the config file has the necessary sections and keys
-if "openphone" not in config or "key" not in config["openphone"]:
-    raise ValueError("Config file is missing required openphone configuration")
-key = config["openphone"]["key"]
-auth_token = config["twilio"]["auth_token"]
-sender_phone_number = config["openphone"]["sender_phone_number"]
+key = os.getenv("OPENPHONE_KEY")
+auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+sender_phone_number = os.getenv("OPENPHONE_SENDER_PHONE_NUMBER")
+twilio_sender_phone_number = os.getenv("TWILIO_SENDER_PHONE_NUMBER")
+twilio_SID = os.getenv("TWILIO_SID")
+if not key or not auth_token or not sender_phone_number:
+    raise ValueError(
+        "Environment variables for API keys and phone numbers are not set"
+    )
 
 
 def sendMessage(content, user_info):

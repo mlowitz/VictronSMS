@@ -1,3 +1,4 @@
+import datetime
 import json
 import re
 from typing import Literal, Union
@@ -19,7 +20,7 @@ class onboardingRequest(BaseModel):
     password: str = None
     supplied_name: str = None
     phone_number: str = None
-    time: str | None = None
+    time: str = "6"
 
 
 class onboardingDetails(onboardingRequest):
