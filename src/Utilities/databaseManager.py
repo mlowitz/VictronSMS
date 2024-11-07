@@ -4,6 +4,7 @@ import json
 import os
 import sys
 from datetime import datetime
+import zoneinfo
 
 import pymongo
 from bson.json_util import dumps, loads
@@ -72,7 +73,9 @@ def getAllSubscriptions() -> list[userManagement.SubscribedUser]:
 
 
 def getAllSubscriptionsForTime() -> list[userManagement.SubscribedUser]:
-    current_hour = str(datetime.now().hour)
+    current_hour = str(
+        datetime.now(zoneinfo.ZoneInfo("America/Los_Angeles")).hour
+    )
     search = {"time": current_hour}
     raw = list(subscribers_collection.find(search))
     subscriptions: list[userManagement.SubscribedUser] = [
