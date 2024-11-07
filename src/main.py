@@ -7,13 +7,6 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 
-with open(
-    os.path.join(os.path.dirname(__file__), "configs/config.json")
-) as config_file:
-    config = json.load(config_file)
-    for key, value in config.items():
-        os.environ[key] = str(value)
-
 import src.VictronProcessors.processor as processor
 import src.SMSUtility.sender as sender
 import src.VictronProcessors.victronHelper as victronHelper
