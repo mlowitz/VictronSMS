@@ -55,8 +55,24 @@ async def get_victron(request: Request):
     return user_info
 
 
-@app.get("/vrm/run")
-async def getValues():
+@app.get(
+    """
+    Endpoint to run for all subscribed users.
+
+    This endpoint retrieves values for all subscribed users and sends messages.
+
+    Returns:
+        dict: A dictionary indicating the run status.
+
+    Raises:
+        HTTPException: If there is an error in retrieving user subscriptions or sending messages.
+
+    """
+    "/vrm/run",
+    summary="Run for All Users",
+    description="Retrieve values for all subscribed users and send messages.",
+)
+async def getAllSubscriptions():
     user_info = databaseManager.getAllSubscriptions()
     if not user_info:
         return {"run": "No users to run"}
@@ -67,8 +83,24 @@ async def getValues():
     return {"run": "done"}
 
 
-@app.get("/vrm/runTime")
-async def getValues():
+@app.get(
+    """
+    Retrieve values for subscribed users based on current time and send messages.
+
+    This endpoint fetches all subscriptions for the current time from the database,
+    retrieves relevant values for each user, processes the data, and sends messages
+    to the users.
+
+    Returns:
+        dict: A dictionary indicating the result of the operation. If no users are
+        found, returns {"run": "No users to run"}. Otherwise, returns the number
+        of users processed in the format {"run": f"Run for {user_info.count()} users"}.
+    """
+    "/vrm/runTime",
+    summary="Run for Users Based on Time",
+    description="Retrieve values for subscribed users based on current time and send messages.",
+)
+async def getSubscriptionsForTime():
     user_info = databaseManager.getAllSubscriptionsForTime()
     if not user_info:
         return {"run": "No users to run"}
@@ -88,7 +120,29 @@ async def getValues(request: Request):
     return result.stat
 
 
-@app.post("/vrm/onboard")
+@app.post(
+    """
+    Handles the onboarding of a new subscriber.
+
+    Endpoint:
+        POST /vrm/onboard
+
+    Summary:
+        Onboard a new subscriber.
+
+    Description:
+        Creates a new subscriber in the database.
+
+    Args:
+        request (userManagement.onboardingRequest): The request object containing the onboarding details.
+
+    Returns:
+        dict: A dictionary with the status of the operation.
+    """
+    "/vrm/onboard",
+    summary="onboard a new subscriber",
+    description="creates a new subscriber in the database",
+)
 async def onBoard(request: userManagement.onboardingRequest):
     c = userManagement.onboardingDetails.from_onboarding_request(request)
     user_info = userManagement.onBoarding(
