@@ -36,7 +36,7 @@ except pymongo.errors.ConfigurationError:
 # use a database named "myDatabase"
 db = client.VrmNotificationSubscriptions
 
-subscribers_collection = db["test"]
+subscribers_collection = db["subscribers"]
 
 # Send a ping to confirm a successful connection
 try:
