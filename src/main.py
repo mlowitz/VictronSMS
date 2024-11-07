@@ -47,7 +47,7 @@ async def read_root():
 
 @app.get("/json")
 async def read_root():
-    with open("/secret/config.json") as config_file:
+    with open("/secret/config.json/latest") as config_file:
         config = json.load(config_file)
     return config
 
