@@ -7,6 +7,13 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 
+with open(
+    os.path.join(os.path.dirname(__file__), "configs/config.json")
+) as config_file:
+    config = json.load(config_file)
+    for key, value in config.items():
+        os.environ[key] = str(value)
+
 import src.VictronProcessors.processor as processor
 import src.SMSUtility.sender as sender
 import src.VictronProcessors.victronHelper as victronHelper
@@ -21,13 +28,6 @@ class onboardBody(BaseModel):
     phone_number: str = None
     time: str = None
 
-
-with open(
-    os.path.join(os.path.dirname(__file__), "configs/config.json")
-) as config_file:
-    config = json.load(config_file)
-    for key, value in config.items():
-        os.environ[key] = str(value)
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
 userToken = ""
