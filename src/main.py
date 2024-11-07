@@ -7,13 +7,6 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 
-with open(
-    os.path.join(os.path.dirname(__file__), "configs/config.json")
-) as config_file:
-    config = json.load(config_file)
-    for key, value in config.items():
-        os.environ[key] = str(value)
-
 import src.VictronProcessors.processor as processor
 import src.SMSUtility.sender as sender
 import src.VictronProcessors.victronHelper as victronHelper
@@ -47,9 +40,9 @@ async def read_root():
 
 @app.get("/json")
 async def read_root():
-    with open("/secret/config.json/latest") as config_file:
+    with open(os.environ["SECRET_PATH"]) as config_file:
         config = json.load(config_file)
-    return config
+        return config
 
 
 @app.post("/vrm/")
