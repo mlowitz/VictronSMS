@@ -54,8 +54,6 @@ async def get_victron(request: Request):
     user_info = victronHelper.getToken(await request.json())
     return user_info
 
-
-@app.get(
     """
     Endpoint to run for all subscribed users.
 
@@ -68,6 +66,9 @@ async def get_victron(request: Request):
         HTTPException: If there is an error in retrieving user subscriptions or sending messages.
 
     """
+
+
+@app.get(
     "/vrm/run",
     summary="Run for All Users",
     description="Retrieve values for all subscribed users and send messages.",
@@ -82,8 +83,6 @@ async def getAllSubscriptions():
         result = sender.sendMessage(message, user)
     return {"run": "done"}
 
-
-@app.get(
     """
     Retrieve values for subscribed users based on current time and send messages.
 
@@ -96,6 +95,9 @@ async def getAllSubscriptions():
         found, returns {"run": "No users to run"}. Otherwise, returns the number
         of users processed in the format {"run": f"Run for {user_info.count()} users"}.
     """
+
+
+@app.get(
     "/vrm/runTime",
     summary="Run for Users Based on Time",
     description="Retrieve values for subscribed users based on current time and send messages.",
@@ -120,25 +122,27 @@ async def getValues(request: Request):
     return result.stat
 
 
+"""
+Handles the onboarding of a new subscriber.
+
+Endpoint:
+    POST /vrm/onboard
+
+Summary:
+    Onboard a new subscriber.
+
+Description:
+    Creates a new subscriber in the database.
+
+Args:
+    request (userManagement.onboardingRequest): The request object containing the onboarding details.
+
+Returns:
+    dict: A dictionary with the status of the operation.
+"""
+
+
 @app.post(
-    """
-    Handles the onboarding of a new subscriber.
-
-    Endpoint:
-        POST /vrm/onboard
-
-    Summary:
-        Onboard a new subscriber.
-
-    Description:
-        Creates a new subscriber in the database.
-
-    Args:
-        request (userManagement.onboardingRequest): The request object containing the onboarding details.
-
-    Returns:
-        dict: A dictionary with the status of the operation.
-    """
     "/vrm/onboard",
     summary="onboard a new subscriber",
     description="creates a new subscriber in the database",
