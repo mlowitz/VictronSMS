@@ -5,6 +5,16 @@ from typing import Union
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
+from google.cloud import secretmanager
+
+
+# Create the Secret Manager client.
+client = secretmanager.SecretManagerServiceClient()
+name = client.secret_path("777217683107", "configfile/versions/latest")
+response = client.access_secret_version(request={"name": name})
+config = json.loads(response.payload.data.decode("UTF-8"))
+for key, value in config.items():
+    os.environ[key] = str(value)
 
 
 import src.VictronProcessors.processor as processor
@@ -33,9 +43,10 @@ async def read_root():
 
 @app.get("/json")
 async def read_root():
-    with open(os.environ["SECRET_PATH"]) as config_file:
-        config = json.load(config_file)
-        return config
+    name = client.secret_path("777217683107", "configfile/versions/latest")
+    response = client.access_secret_version(request={"name": name})
+    config = json.loads(response.payload.data.decode("UTF-8"))
+    return config
 
 
 @app.post("/vrm/")

@@ -10,3 +10,4 @@ twilio
 pymongo
 pytest
 typing_extensions
+google-cloud-secret-manager
