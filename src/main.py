@@ -1,4 +1,5 @@
 import json
+from math import log
 import os
 import re
 from typing import Union
@@ -147,8 +148,12 @@ Returns:
     summary="onboard a new subscriber",
     description="creates a new subscriber in the database",
 )
-async def onBoard(request: userManagement.onboardingRequest):
-    c = userManagement.onboardingDetails.from_onboarding_request(request)
+async def onBoard(request: Request):
+    # user_in
+    log(request.body())
+    c = userManagement.onboardingDetails.from_onboarding_request(
+        request.body()
+    )
     user_info = userManagement.onBoarding(
         userManagement.onboardingDetails.from_onboarding_request(request)
     )
