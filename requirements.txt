@@ -11,3 +11,6 @@ pymongo
 pytest
 typing_extensions
 google-cloud-secret-manager
+starlette
+google.cloud.logging
+logging
