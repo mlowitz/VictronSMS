@@ -1,13 +1,18 @@
 import json
-from math import log
+import logging
 import os
 import re
+from datetime import datetime
 from typing import Union
 
+import google.cloud.logging
 from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
 from google.cloud import secretmanager
+from pydantic import BaseModel
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 
+logger = logging.getLogger(__name__)
 
 # Create the Secret Manager client.
 client = secretmanager.SecretManagerServiceClient()
@@ -18,11 +23,23 @@ for key, value in config.items():
     os.environ[key] = str(value)
 
 
-import src.VictronProcessors.processor as processor
 import src.SMSUtility.sender as sender
-import src.VictronProcessors.victronHelper as victronHelper
-import src.VictronProcessors.userManagement as userManagement
 import src.Utilities.databaseManager as databaseManager
+import src.VictronProcessors.processor as processor
+import src.VictronProcessors.userManagement as userManagement
+import src.VictronProcessors.victronHelper as victronHelper
+
+loggingClient = google.cloud.logging.Client(project="777217683107")
+loggingClient.setup_logging()
+
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        logger.info(
+            f"{request.method} {request.url.path} - {response.status_code}"
+        )
+        return response
 
 
 class onboardBody(BaseModel):
@@ -34,6 +51,7 @@ class onboardBody(BaseModel):
 
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
+app.add_middleware(RequestLoggingMiddleware)
 userToken = ""
 
 
@@ -148,12 +166,8 @@ Returns:
     summary="onboard a new subscriber",
     description="creates a new subscriber in the database",
 )
-async def onBoard(request: Request):
-    # user_in
-    log(request.body())
-    c = userManagement.onboardingDetails.from_onboarding_request(
-        request.body()
-    )
+async def onBoard(request: userManagement.onboardingRequest):
+    c = userManagement.onboardingDetails.from_onboarding_request(request)
     user_info = userManagement.onBoarding(
         userManagement.onboardingDetails.from_onboarding_request(request)
     )
