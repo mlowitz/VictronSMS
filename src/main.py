@@ -39,6 +39,10 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         logger.info(
             f"{request.method} {request.url.path} - {response.status_code}"
         )
+        body = await request.body()
+        if body:
+            logger.info(f"Request body: {body.decode('utf-8')}")
+        response = await call_next(request)
         return response
 
 
@@ -53,6 +57,15 @@ class onboardBody(BaseModel):
 app = FastAPI(openapi_url="/api/v1/openapi.json")
 app.add_middleware(RequestLoggingMiddleware)
 userToken = ""
+
+
+@app.middleware("http")
+async def log_request_body(request: Request, call_next):
+    body = await request.body()
+    if body:
+        logging.info(f"Request body: {body.decode('utf-8')}")
+    response = await call_next(request)
+    return response
 
 
 @app.get("/")
