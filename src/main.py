@@ -75,7 +75,7 @@ userToken = ""
 @app.middleware("http")
 async def request_body_fix(request: Request, call_next):
     body = await request.body()
-    logger.info()(f"Body: {body}")
+    logger.info(f"Body: {body}")
     return await call_next(request)
 
 
