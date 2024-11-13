@@ -33,13 +33,27 @@ loggingClient = google.cloud.logging.Client(project="777217683107")
 loggingClient.setup_logging()
 
 
+async def read_body_cached(request: Request) -> bytes:
+    request.scope["cached_body"] = body = await request.body()
+    return body
+
+
+async def endpoint(request: Request) -> Response:
+    if randint(1, 1) > 0.5:  # some condition you want
+        body = await read_body_cached(request)
+    else:
+        body = await request.body()
+    return Response(body)
+
+
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         logger.info(
             f"{request.method} {request.url.path} - {response.status_code}"
         )
-        body = await request.body()
+        request.scope["cached_body"] = body = await request.body()
+        body: bytes | None = request.scope.get("cached_body")
         if body:
             logger.info(f"Request body: {body.decode('utf-8')}")
         response = await call_next(request)
@@ -55,17 +69,14 @@ class onboardBody(BaseModel):
 
 
 app = FastAPI(openapi_url="/api/v1/openapi.json")
-app.add_middleware(RequestLoggingMiddleware)
 userToken = ""
 
 
 @app.middleware("http")
-async def log_request_body(request: Request, call_next):
+async def request_body_fix(request: Request, call_next):
     body = await request.body()
-    if body:
-        logging.info(f"Request body: {body.decode('utf-8')}")
-    response = await call_next(request)
-    return response
+    logger.info()(f"Body: {body}")
+    return await call_next(request)
 
 
 @app.get("/")
