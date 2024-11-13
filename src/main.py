@@ -33,33 +33,6 @@ loggingClient = google.cloud.logging.Client(project="777217683107")
 loggingClient.setup_logging()
 
 
-async def read_body_cached(request: Request) -> bytes:
-    request.scope["cached_body"] = body = await request.body()
-    return body
-
-
-async def endpoint(request: Request) -> Response:
-    if randint(1, 1) > 0.5:  # some condition you want
-        body = await read_body_cached(request)
-    else:
-        body = await request.body()
-    return Response(body)
-
-
-class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
-        logger.info(
-            f"{request.method} {request.url.path} - {response.status_code}"
-        )
-        request.scope["cached_body"] = body = await request.body()
-        body: bytes | None = request.scope.get("cached_body")
-        if body:
-            logger.info(f"Request body: {body.decode('utf-8')}")
-        response = await call_next(request)
-        return response
-
-
 class onboardBody(BaseModel):
     username: str = None
     password: str = None
@@ -191,6 +164,7 @@ Returns:
     description="creates a new subscriber in the database",
 )
 async def onBoard(request: userManagement.onboardingRequest):
+    logger.info(f"made it into onboard")
     c = userManagement.onboardingDetails.from_onboarding_request(request)
     user_info = userManagement.onBoarding(
         userManagement.onboardingDetails.from_onboarding_request(request)
